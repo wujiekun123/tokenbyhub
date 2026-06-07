@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOKEN-HUB — 新一代个性化智能体平台</title>
+  <meta name="description" content="TOKEN-HUB 是新旦智能打造的新一代 AI 原生产品，构建个性化的多模态智能体，为用户提供专属的智能服务体验。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Reset & Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #060912;
+      --bg2:       #0b0f1c;
+      --bg3:       #101525;
+      --border:    rgba(255,255,255,.08);
+      --border2:   rgba(255,255,255,.12);
+      --text:      #f0f2ff;
+      --muted:     #8892b0;
+      --accent1:   #6c63ff;
+      --accent2:   #a78bfa;
+      --accent3:   #38bdf8;
+      --grad1:     linear-gradient(135deg, #6c63ff 0%, #a78bfa 50%, #38bdf8 100%);
+      --grad2:     linear-gradient(135deg, #6c63ff, #a78bfa);
+      --glow:      0 0 60px rgba(108,99,255,.35);
+      --glow2:     0 0 80px rgba(108,99,255,.2);
+      --radius:    16px;
+      --radius-lg: 24px;
+      --shadow:    0 4px 24px rgba(0,0,0,.4);
+      --shadow-lg: 0 16px 64px rgba(0,0,0,.5);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--accent1); border-radius: 4px; }
+
+    /* ─── Noise overlay ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: .4;
+    }
+
+    /* ─── Glow blobs ─── */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .blob-1 { width: 600px; height: 600px; background: rgba(108,99,255,.18); top: -100px; left: -150px; }
+    .blob-2 { width: 500px; height: 500px; background: rgba(56,189,248,.12); top: 200px; right: -100px; }
+    .blob-3 { width: 400px; height: 400px; background: rgba(167,139,250,.15); top: 50%; left: 40%; transform: translate(-50%,-50%); }
+
+    /* ─── Utility ─── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .gradient-text {
+      background: var(--grad1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px;
+      border-radius: 12px;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all .25s cubic-bezier(.4,0,.2,1);
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--grad2);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(108,99,255,.45);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(108,99,255,.6);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border2);
+      backdrop-filter: blur(8px);
+    }
+    .btn-outline:hover {
+      background: rgba(255,255,255,.05);
+      border-color: var(--accent2);
+      transform: translateY(-2px);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,.09); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+      border: 1px solid var(--border2);
+      background: rgba(108,99,255,.12);
+      color: var(--accent2);
+      backdrop-filter: blur(8px);
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent1); box-shadow: 0 0 8px var(--accent1); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 16px 0;
+      border-bottom: 1px solid transparent;
+      transition: all .3s;
+    }
+    nav.scrolled {
+      background: rgba(6,9,18,.85);
+      backdrop-filter: blur(20px);
+      border-bottom-color: var(--border);
+      box-shadow: 0 4px 32px rgba(0,0,0,.3);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 22px; font-weight: 800; letter-spacing: -.5px;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--grad2);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 16px rgba(108,99,255,.5);
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 4px;
+      list-style: none;
+    }
+    .nav-links a {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px; font-weight: 500;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,.05); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-mobile-btn { display: none; background: none; border: none; color: var(--text); cursor: pointer; padding: 8px; }
+
+    /* ─── HERO ─── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex; align-items: center;
+      overflow: hidden;
+      padding: 120px 0 80px;
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(108,99,255,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(108,99,255,.06) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, black, transparent);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow { margin-bottom: 28px; }
+    .hero-title {
+      font-size: clamp(42px, 7vw, 88px);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--muted);
+      max-width: 580px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+    .hero-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px;
+      margin-top: 72px;
+      padding-top: 48px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-size: 36px; font-weight: 800; letter-spacing: -1px;
+      background: var(--grad1);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+    /* ─── Marquee ─── */
+    .marquee-section {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+      overflow: hidden;
+    }
+    .marquee-label {
+      text-align: center;
+      font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .marquee-track {
+      display: flex; gap: 48px;
+      animation: marquee 25s linear infinite;
+      width: max-content;
+    }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .marquee-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      white-space: nowrap;
+    }
+    .marquee-item svg { color: var(--accent2); }
+
+    /* ─── Section ─── */
+    section { padding: 100px 0; position: relative; }
+    .section-header {
+      text-align: center; margin-bottom: 64px;
+    }
+    .section-title {
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 800; letter-spacing: -1.5px;
+      margin-bottom: 16px; line-height: 1.15;
+    }
+    .section-sub {
+      font-size: 17px; color: var(--muted);
+      max-width: 560px; margin: 0 auto; line-height: 1.7;
+    }
+
+    /* ─── Features Grid ─── */
+    #features { background: var(--bg2); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .feature-card {
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      backdrop-filter: blur(10px);
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--grad1);
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .feature-card:hover { transform: translateY(-4px); border-color: var(--border2); box-shadow: var(--shadow-lg); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: rgba(108,99,255,.15);
+      border: 1px solid rgba(108,99,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      transition: all .3s;
+    }
+    .feature-card:hover .feature-icon { box-shadow: 0 0 24px rgba(108,99,255,.4); }
+    .feature-name { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .feature-card.featured {
+      grid-column: span 2;
+      background: linear-gradient(135deg, rgba(108,99,255,.1), rgba(56,189,248,.05));
+      border-color: rgba(108,99,255,.3);
+    }
+    .feature-card.featured::before { opacity: 1; }
+    .feature-card.featured-tall {
+      grid-row: span 2;
+    }
+
+    /* ─── Product Demo ─── */
+    #demo { overflow: hidden; }
+    .demo-window {
+      max-width: 900px;
+      margin: 0 auto;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border2);
+      overflow: hidden;
+      box-shadow: var(--glow2), var(--shadow-lg);
+      background: var(--bg3);
+    }
+    .demo-toolbar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 20px;
+      background: rgba(255,255,255,.04);
+      border-bottom: 1px solid var(--border);
+    }
+    .demo-dot { width: 12px; height: 12px; border-radius: 50%; }
+    .demo-dot.red { background: #ff5f57; }
+    .demo-dot.yellow { background: #febc2e; }
+    .demo-dot.green { background: #28c840; }
+    .demo-url {
+      flex: 1; margin-left: 12px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.05);
+      font-size: 12px; color: var(--muted);
+      font-family: monospace;
+    }
+    .demo-body { padding: 32px; }
+    .chat-messages { display: flex; flex-direction: column; gap: 20px; }
+    .msg {
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .msg.user { flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .msg-avatar.ai {
+      background: var(--grad2);
+      box-shadow: 0 4px 14px rgba(108,99,255,.4);
+    }
+    .msg-avatar.user-av { background: rgba(255,255,255,.1); }
+    .msg-bubble {
+      max-width: 72%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 14px; line-height: 1.65;
+    }
+    .msg.ai .msg-bubble {
+      background: rgba(108,99,255,.12);
+      border: 1px solid rgba(108,99,255,.2);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.user .msg-bubble {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      border-bottom-right-radius: 4px;
+    }
+    .msg-typing { display: flex; gap: 5px; align-items: center; padding: 8px 0; }
+    .typing-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent2);
+      animation: typingBounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: .2s; }
+    .typing-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes typingBounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-8px)} }
+    .demo-input {
+      display: flex; gap: 10px;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .demo-input-field {
+      flex: 1;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--muted);
+      font-size: 14px; font-family: inherit;
+      outline: none;
+    }
+    .demo-send {
+      width: 44px; height: 44px;
+      background: var(--grad2);
+      border: none; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(108,99,255,.4);
+    }
+
+    /* ─── How It Works ─── */
+    #how { background: var(--bg2); }
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 52px; left: 12.5%; right: 12.5%;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent1), var(--accent3));
+      opacity: .3;
+    }
+    .step-card {
+      padding: 32px 24px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      text-align: center;
+      transition: all .3s;
+    }
+    .step-card:hover { transform: translateY(-4px); border-color: var(--border2); }
+    .step-num {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--grad2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800;
+      margin: 0 auto 20px;
+      box-shadow: 0 4px 20px rgba(108,99,255,.4);
+    }
+    .step-title { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+    .step-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+
+    /* ─── Models ─── */
+    .models-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .model-card {
+      padding: 28px 32px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      transition: all .3s;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .model-card:hover { border-color: rgba(108,99,255,.4); box-shadow: var(--glow2); transform: translateY(-2px); }
+    .model-badge-wrap { flex-shrink: 0; }
+    .model-badge {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: var(--grad2);
+      font-size: 13px; font-weight: 800;
+      letter-spacing: .5px;
+      box-shadow: 0 4px 14px rgba(108,99,255,.4);
+    }
+    .model-info { flex: 1; }
+    .model-name { font-size: 19px; font-weight: 700; margin-bottom: 8px; }
+    .model-desc { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+    .model-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .model-tag {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(108,99,255,.12);
+      color: var(--accent2);
+      border: 1px solid rgba(108,99,255,.2);
+    }
+
+    /* ─── Use Cases ─── */
+    #usecases { background: var(--bg2); }
+    .usecases-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .usecase-card {
+      padding: 32px 28px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      transition: all .3s;
+      cursor: pointer;
+    }
+    .usecase-card:hover { border-color: rgba(108,99,255,.35); transform: translateY(-4px); box-shadow: 0 12px 48px rgba(108,99,255,.15); }
+    .usecase-icon { font-size: 36px; margin-bottom: 16px; }
+    .usecase-name { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .usecase-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+    .usecase-arrow { margin-top: 20px; color: var(--accent2); font-size: 20px; transition: transform .2s; }
+    .usecase-card:hover .usecase-arrow { transform: translateX(6px); }
+
+    /* ─── Pricing ─── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+      align-items: start;
+    }
+    .price-card {
+      padding: 36px 32px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      position: relative;
+      overflow: hidden;
+      transition: all .3s;
+    }
+    .price-card:hover { transform: translateY(-4px); }
+    .price-card.popular {
+      border-color: rgba(108,99,255,.5);
+      background: linear-gradient(160deg, rgba(108,99,255,.12), rgba(56,189,248,.05));
+      box-shadow: var(--glow2);
+    }
+    .popular-badge {
+      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      background: var(--grad2);
+      color: #fff;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      padding: 5px 18px;
+      border-radius: 0 0 12px 12px;
+    }
+    .price-plan { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--accent2); margin-bottom: 12px; }
+    .price-amount {
+      font-size: 52px; font-weight: 900; letter-spacing: -2px;
+      line-height: 1; margin-bottom: 4px;
+    }
+    .price-amount span { font-size: 22px; font-weight: 600; vertical-align: top; margin-top: 12px; display: inline-block; }
+    .price-period { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .price-desc { font-size: 14px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .price-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+    .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .price-features li {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 14px; color: var(--muted);
+    }
+    .check-icon { color: var(--accent1); flex-shrink: 0; margin-top: 2px; }
+    .cross-icon { color: #555; flex-shrink: 0; margin-top: 2px; }
+
+    /* ─── Testimonials ─── */
+    #testimonials { background: var(--bg2); overflow: hidden; }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .testi-card {
+      padding: 28px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+      transition: all .3s;
+    }
+    .testi-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+    .testi-stars { display: flex; gap: 3px; margin-bottom: 16px; color: #fbbf24; font-size: 14px; }
+    .testi-quote { font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 24px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 700;
+      background: var(--grad2);
+    }
+    .testi-name { font-size: 14px; font-weight: 700; }
+    .testi-role { font-size: 12px; color: var(--muted); }
+
+    /* ─── CTA ─── */
+    #cta {
+      text-align: center;
+      padding: 120px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(108,99,255,.15), transparent 70%);
+    }
+    .cta-title {
+      font-size: clamp(36px, 5vw, 68px);
+      font-weight: 900; letter-spacing: -2px;
+      line-height: 1.1; margin-bottom: 20px;
+    }
+    .cta-sub {
+      font-size: 18px; color: var(--muted);
+      max-width: 500px; margin: 0 auto 40px;
+    }
+    .cta-actions { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .cta-note { margin-top: 16px; font-size: 13px; color: var(--muted); }
+
+    /* ─── Footer ─── */
+    footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 72px 0 32px;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 64px;
+    }
+    .footer-brand { max-width: 280px; }
+    .footer-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 20px; font-weight: 800;
+      margin-bottom: 16px;
+    }
+    .footer-desc { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+    .footer-social { display: flex; gap: 10px; }
+    .social-btn {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      transition: all .2s;
+      cursor: pointer;
+    }
+    .social-btn:hover { border-color: var(--accent2); background: rgba(108,99,255,.1); }
+    .footer-col-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text); margin-bottom: 20px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links li a {
+      font-size: 14px; color: var(--muted);
+      transition: color .2s;
+    }
+    .footer-links li a:hover { color: var(--text); }
+    .footer-bottom {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 32px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-copy { font-size: 13px; color: var(--muted); }
+    .footer-legal { display: flex; gap: 20px; }
+    .footer-legal a { font-size: 13px; color: var(--muted); transition: color .2s; }
+    .footer-legal a:hover { color: var(--text); }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 1024px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .feature-card.featured { grid-column: span 2; }
+      .steps { grid-template-columns: repeat(2, 1fr); }
+      .steps::before { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 32px; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-actions .btn-outline { display: none; }
+      .nav-mobile-btn { display: flex; }
+      .hero-stats { gap: 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-card.featured { grid-column: span 1; }
+      .models-grid { grid-template-columns: 1fr; }
+      .usecases-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr; gap: 24px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      section { padding: 72px 0; }
+    }
+
+    /* ─── Animations ─── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .fade-up:nth-child(1) { transition-delay: .05s; }
+    .fade-up:nth-child(2) { transition-delay: .15s; }
+    .fade-up:nth-child(3) { transition-delay: .25s; }
+    .fade-up:nth-child(4) { transition-delay: .35s; }
+    .fade-up:nth-child(5) { transition-delay: .45s; }
+    .fade-up:nth-child(6) { transition-delay: .55s; }
+
+    /* ─── Glow ring ─── */
+    .glow-ring {
+      display: inline-block;
+      position: relative;
+    }
+    .glow-ring::after {
+      content: '';
+      position: absolute; inset: -3px;
+      border-radius: inherit;
+      background: var(--grad1);
+      z-index: -1;
+      filter: blur(12px);
+      opacity: .5;
+    }
+
+    /* ─── Mobile menu ─── */
+    .mobile-menu {
+      position: fixed; inset: 0;
+      background: rgba(6,9,18,.97);
+      backdrop-filter: blur(20px);
+      z-index: 999;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .3s;
+    }
+    .mobile-menu.open { opacity: 1; pointer-events: all; }
+    .mobile-menu a {
+      font-size: 28px; font-weight: 700;
+      color: var(--muted);
+      transition: color .2s;
+    }
+    .mobile-menu a:hover { color: var(--text); }
+    .mobile-close {
+      position: absolute; top: 20px; right: 24px;
+      background: none; border: none; color: var(--text);
+      font-size: 28px; cursor: pointer;
+    }
+
+    /* ─── Counter animation ─── */
+    .counter { display: inline-block; }
+  </style>
+</head>
+<body>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMobile()">✕</button>
+  <a href="#features" onclick="closeMobile()">功能特性</a>
+  <a href="#demo" onclick="closeMobile()">产品演示</a>
+  <a href="#how" onclick="closeMobile()">使用流程</a>
+  <a href="#usecases" onclick="closeMobile()">应用场景</a>
+  <a href="#pricing" onclick="closeMobile()">价格方案</a>
+  <div style="display:flex;gap:12px;margin-top:16px;">
+    <a href="#" class="btn btn-outline">登录</a>
+    <a href="#" class="btn btn-primary">免费开始</a>
+  </div>
+</div>
+
+<!-- ─── NAV ─── -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="logo-icon">✦</div>
+      <span>TOKEN<span class="gradient-text">-HUB</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#features">功能特性</a></li>
+      <li><a href="#demo">产品演示</a></li>
+      <li><a href="#how">使用流程</a></li>
+      <li><a href="#usecases">应用场景</a></li>
+      <li><a href="#pricing">价格方案</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn btn-outline" style="padding:9px 20px;font-size:14px;">登录</a>
+      <a href="#" class="btn btn-primary" style="padding:9px 20px;font-size:14px;">免费开始 →</a>
+    </div>
+    <button class="nav-mobile-btn" onclick="openMobile()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="hero-grid"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          xDAN 模型驱动 · 全新升级
+        </div>
+      </div>
+      <h1 class="hero-title">
+        与你共鸣的<br/>
+        <span class="gradient-text">个性化 AI 智能体</span>
+      </h1>
+      <p class="hero-sub">
+        TOKEN-HUB 以高情商推理为核心，构建真正懂你的多模态智能体，
+        提供跨场景、全方位的专属智能服务体验。
+      </p>
+      <div class="hero-actions">
+        <a href="#demo" class="btn btn-primary" style="padding:14px 32px;font-size:16px;">
+          立即体验 →
+        </a>
+        <a href="#features" class="btn btn-outline" style="padding:14px 32px;font-size:16px;">
+          了解更多
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num"><span class="counter" data-target="2000000">0</span>+</div>
+          <div class="stat-label">活跃用户</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num"><span class="counter" data-target="50">0</span>+</div>
+          <div class="stat-label">企业合作伙伴</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num"><span class="counter" data-target="1000">0</span>亿+</div>
+          <div class="stat-label">Token 处理量</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num"><span class="counter" data-target="99">0</span>.<span class="counter" data-target="9">0</span>%</div>
+          <div class="stat-label">服务可用性</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── Marquee ─── -->
+<div class="marquee-section">
+  <div class="marquee-label">已支持的能力与集成</div>
+  <div style="overflow:hidden;">
+    <div class="marquee-track" id="marqueeTrack">
+      <!-- Original -->
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        实时流式对话
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        多模态理解
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Function Calling
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        长文本理解 128K
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        代码生成与调试
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        联网搜索增强
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        知识库 RAG
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Agents 自主规划
+      </div>
+      <!-- Duplicate for seamless loop -->
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        实时流式对话
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        多模态理解
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Function Calling
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        长文本理解 128K
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        代码生成与调试
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        联网搜索增强
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        知识库 RAG
+      </div>
+      <div class="marquee-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Agents 自主规划
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FEATURES ─── -->
+<section id="features">
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">核心能力</div>
+      <h2 class="section-title">为什么选择 <span class="gradient-text">TOKEN-HUB</span></h2>
+      <p class="section-sub">深度融合高情商推理与多模态感知，打造真正懂你的智能助手</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card featured fade-up" style="transition-delay:.05s">
+        <div style="display:flex;align-items:flex-start;gap:20px;">
+          <div class="feature-icon" style="background:rgba(108,99,255,.2);border-color:rgba(108,99,255,.4);">🧠</div>
+          <div style="flex:1;">
+            <div class="feature-name">高情商推理引擎</div>
+            <div class="feature-desc">基于 xDAN 模型的独特情商感知能力，理解用户情绪与意图，提供更贴近人心的回应，而非冷冰冰的信息堆砌。在复杂对话场景中展现出卓越的上下文理解与共情能力。</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
+          <div class="model-tag">情感感知</div>
+          <div class="model-tag">意图理解</div>
+          <div class="model-tag">上下文记忆</div>
+          <div class="model-tag">个性化适配</div>
+        </div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.15s">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-name">多模态感知</div>
+        <div class="feature-desc">无缝处理文字、图像、代码、文档等多种输入形式，实现跨模态的深度理解与融合分析。</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.25s">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-name">超低延迟响应</div>
+        <div class="feature-desc">经过深度算法优化，首 Token 延迟极低，流式输出流畅自然，打造极致的实时对话体验。</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.35s">
+        <div class="feature-icon">🔗</div>
+        <div class="feature-name">自主 Agent 规划</div>
+        <div class="feature-desc">支持多步骤任务拆解、工具调用与自主规划，让 AI 真正帮你完成复杂工作流，而不只是回答问题。</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.45s">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-name">企业级安全</div>
+        <div class="feature-desc">端到端加密、数据隔离、权限管控，满足企业合规要求，保护您的核心数据资产。</div>
+      </div>
+      <div class="feature-card fade-up" style="transition-delay:.55s">
+        <div class="feature-icon">🌐</div>
+        <div class="feature-name">实时联网增强</div>
+        <div class="feature-desc">内置搜索增强检索能力，实时获取最新信息，知识边界不再局限于训练截止日期。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DEMO ─── -->
+<section id="demo">
+  <div class="blob blob-3"></div>
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">产品演示</div>
+      <h2 class="section-title">对话，即<span class="gradient-text">创造</span></h2>
+      <p class="section-sub">感受 TOKEN-HUB 在真实场景中的强大表现，从问答到复杂任务，一气呵成</p>
+    </div>
+    <div class="demo-window fade-up">
+      <div class="demo-toolbar">
+        <div class="demo-dot red"></div>
+        <div class="demo-dot yellow"></div>
+        <div class="demo-dot green"></div>
+        <div class="demo-url">token-hub.ai/chat</div>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <div style="width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);"></div>
+          <div style="width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);"></div>
+        </div>
+      </div>
+      <div class="demo-body">
+        <div class="chat-messages" id="chatMessages">
+          <div class="msg ai">
+            <div class="msg-avatar ai">✦</div>
+            <div class="msg-bubble">你好！我是 TOKEN-HUB，你的专属智能助手。我能理解你的情感状态、帮你完成复杂任务，也可以陪你探索任何感兴趣的话题。今天想聊什么？</div>
+          </div>
+          <div class="msg user">
+            <div class="msg-avatar user-av">👤</div>
+            <div class="msg-bubble">帮我分析一下当前 AI 大模型市场的竞争格局，用表格总结主要玩家的优劣势</div>
+          </div>
+          <div class="msg ai" id="aiResponseMsg" style="display:none;">
+            <div class="msg-avatar ai">✦</div>
+            <div class="msg-bubble" id="aiResponseBubble"></div>
+          </div>
+          <div class="msg ai" id="typingMsg">
+            <div class="msg-avatar ai">✦</div>
+            <div class="msg-bubble">
+              <div class="msg-typing">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-input">
+          <input class="demo-input-field" type="text" id="chatInput" placeholder="向 TOKEN-HUB 提问…" />
+          <button class="demo-send" onclick="sendMessage()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how">
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">使用流程</div>
+      <h2 class="section-title">三步开启你的 <span class="gradient-text">AI 助手</span></h2>
+      <p class="section-sub">最简单的上手方式，最强大的 AI 能力</p>
+    </div>
+    <div class="steps">
+      <div class="step-card fade-up">
+        <div class="step-num">1</div>
+        <div class="step-title">创建账号</div>
+        <div class="step-desc">30 秒完成注册，支持微信、邮箱快捷登录，无需任何复杂配置</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-num">2</div>
+        <div class="step-title">配置你的智能体</div>
+        <div class="step-desc">选择专属角色、设定偏好风格、上传知识库，打造属于你的个性化 AI</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-num">3</div>
+        <div class="step-title">开始对话创作</div>
+        <div class="step-desc">直接输入任务需求，TOKEN-HUB 自动规划、调用工具、生成高质量结果</div>
+      </div>
+      <div class="step-card fade-up">
+        <div class="step-num">4</div>
+        <div class="step-title">持续学习优化</div>
+        <div class="step-desc">AI 不断从你的使用习惯中学习，越用越懂你，体验持续提升</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── MODELS ─── -->
+<section id="models">
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">xDAN 模型家族</div>
+      <h2 class="section-title">选择最适合你的 <span class="gradient-text">AI 模型</span></h2>
+      <p class="section-sub">针对不同场景优化的多个模型版本，总有一款满足你的需求</p>
+    </div>
+    <div class="models-grid">
+      <div class="model-card fade-up">
+        <div class="model-badge-wrap">
+          <div class="model-badge">Pro</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">xDAN-4.0 Pro</div>
+          <div class="model-desc">旗舰级推理模型，在复杂逻辑推理、长文本理解和多步骤任务中表现卓越，适合专业用户和高要求场景。</div>
+          <div class="model-tags">
+            <div class="model-tag">128K 上下文</div>
+            <div class="model-tag">多模态</div>
+            <div class="model-tag">高情商推理</div>
+            <div class="model-tag">Agent 规划</div>
+          </div>
+        </div>
+      </div>
+      <div class="model-card fade-up">
+        <div class="model-badge-wrap">
+          <div class="model-badge" style="background:linear-gradient(135deg,#38bdf8,#6c63ff);">Turbo</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">xDAN-4.0 Turbo</div>
+          <div class="model-desc">极速响应版本，保持高质量输出的同时大幅降低延迟，适合实时对话、创意写作和日常助手场景。</div>
+          <div class="model-tags">
+            <div class="model-tag">超低延迟</div>
+            <div class="model-tag">流式输出</div>
+            <div class="model-tag">创意写作</div>
+            <div class="model-tag">日常对话</div>
+          </div>
+        </div>
+      </div>
+      <div class="model-card fade-up">
+        <div class="model-badge-wrap">
+          <div class="model-badge" style="background:linear-gradient(135deg,#f472b6,#a78bfa);">MoE</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">xDAN-MoE 1000B</div>
+          <div class="model-desc">千亿参数混合专家架构，国内首款同类模型，以稀疏激活实现超强性能，同时控制推理成本。</div>
+          <div class="model-tags">
+            <div class="model-tag">1000B 参数</div>
+            <div class="model-tag">MoE 架构</div>
+            <div class="model-tag">高性价比</div>
+            <div class="model-tag">专家路由</div>
+          </div>
+        </div>
+      </div>
+      <div class="model-card fade-up">
+        <div class="model-badge-wrap">
+          <div class="model-badge" style="background:linear-gradient(135deg,#34d399,#38bdf8);">Lite</div>
+        </div>
+        <div class="model-info">
+          <div class="model-name">xDAN-4.0 Lite</div>
+          <div class="model-desc">轻量高效版本，专为边缘部署和成本敏感场景设计，提供出色的基础对话与文本处理能力。</div>
+          <div class="model-tags">
+            <div class="model-tag">轻量部署</div>
+            <div class="model-tag">低成本</div>
+            <div class="model-tag">高并发</div>
+            <div class="model-tag">API 友好</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── USE CASES ─── -->
+<section id="usecases">
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">应用场景</div>
+      <h2 class="section-title">无处不在的 <span class="gradient-text">AI 能力</span></h2>
+      <p class="section-sub">从个人效率到企业数字化转型，TOKEN-HUB 全面赋能各行各业</p>
+    </div>
+    <div class="usecases-grid">
+      <div class="usecase-card fade-up">
+        <div class="usecase-icon">✍️</div>
+        <div class="usecase-name">内容创作</div>
+        <div class="usecase-desc">文章撰写、营销文案、社交媒体内容、创意故事……一句话生成专业级内容，写作效率提升 10 倍。</div>
+        <div class="usecase-arrow">→</div>
+      </div>
+      <div class="usecase-card fade-up">
+        <div class="usecase-icon">💻</div>
+        <div class="usecase-name">智能编程</div>
+        <div class="usecase-desc">代码补全、Bug 定位、架构设计、单测生成。支持 50+ 编程语言，是你永不疲倦的编程搭档。</div>
+        <div class="usecase-arrow">→</div>
+      </div>
+      <div class="usecase-card fade-up">
+        <div class="usecase-icon">📊</div>
+        <div class="usecase-name">数据分析</div>
+        <div class="usecase-desc">上传数据表，用自然语言提问，自动生成分析报告与可视化图表，让数据驱动决策变得简单。</div>
+        <div class="usecase-arrow">→</div>
+      </div>
+      <div class="usecase-card fade-up">
+        <div class="usecase-icon">🎓</div>
+        <div class="usecase-name">学习辅导</div>
+        <div class="usecase-desc">个性化学习路径、知识点讲解、练习题生成，AI 老师 24 小时在线，因材施教无上限。</div>
+        <div class="usecase-arrow">→</div>
+      </div>
+      <div class="usecase-card fade-up">
+        <div class="usecase-icon">🏢</div>
+        <div class="usecase-name">企业知识管理</div>
+        <div class="usecase-desc">接入企业知识库，实现智能问答与文档检索，让内部知识实时流动，告别信息孤岛。</div>
+        <div class="usecase-arrow">→</div>
+      </div>
+      <div class="usecase-card fade-up">
+        <div class="usecase-icon">🤝</div>
+        <div class="usecase-name">智能客服</div>
+        <div class="usecase-desc">7×24 小时无间断服务，理解复杂意图、情绪感知、多轮上下文，满意度大幅提升。</div>
+        <div class="usecase-arrow">→</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRICING ─── -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">价格方案</div>
+      <h2 class="section-title">透明定价，<span class="gradient-text">按需选择</span></h2>
+      <p class="section-sub">从个人用户到大型企业，我们提供灵活的定价方案满足不同规模的需求</p>
+    </div>
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="price-card fade-up">
+        <div class="price-plan">免费版</div>
+        <div class="price-amount"><span>¥</span>0</div>
+        <div class="price-period">永久免费</div>
+        <div class="price-desc">适合个人用户体验 TOKEN-HUB 的核心能力</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check-icon">✓</span> xDAN-4.0 Lite 模型访问</li>
+          <li><span class="check-icon">✓</span> 每日 50 条对话</li>
+          <li><span class="check-icon">✓</span> 基础多模态（图片理解）</li>
+          <li><span class="check-icon">✓</span> 社区技术支持</li>
+          <li><span class="cross-icon">✗</span> <span style="opacity:.5">联网搜索增强</span></li>
+          <li><span class="cross-icon">✗</span> <span style="opacity:.5">Agent 自主规划</span></li>
+          <li><span class="cross-icon">✗</span> <span style="opacity:.5">知识库接入</span></li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;justify-content:center;">免费注册</a>
+      </div>
+      <!-- Pro -->
+      <div class="price-card popular fade-up">
+        <div class="popular-badge">最受欢迎</div>
+        <div class="price-plan">专业版</div>
+        <div class="price-amount"><span>¥</span>99</div>
+        <div class="price-period">/ 月 · 年付享 8 折优惠</div>
+        <div class="price-desc">适合重度使用者和创意工作者，解锁全部核心功能</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check-icon">✓</span> xDAN-4.0 Pro + Turbo 全系列</li>
+          <li><span class="check-icon">✓</span> 无限对话次数</li>
+          <li><span class="check-icon">✓</span> 全模态输入支持</li>
+          <li><span class="check-icon">✓</span> 联网搜索增强</li>
+          <li><span class="check-icon">✓</span> Agent 自主规划</li>
+          <li><span class="check-icon">✓</span> 个人知识库 5GB</li>
+          <li><span class="check-icon">✓</span> 优先响应 + 邮件支持</li>
+        </ul>
+        <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;">立即升级 →</a>
+      </div>
+      <!-- Enterprise -->
+      <div class="price-card fade-up">
+        <div class="price-plan">企业版</div>
+        <div class="price-amount" style="font-size:40px;">定制</div>
+        <div class="price-period">联系销售获取报价</div>
+        <div class="price-desc">适合需要私有化部署、定制模型和企业级 SLA 的团队</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check-icon">✓</span> 全模型访问 + 专属微调</li>
+          <li><span class="check-icon">✓</span> 私有化部署支持</li>
+          <li><span class="check-icon">✓</span> 企业知识库无限容量</li>
+          <li><span class="check-icon">✓</span> SSO / SAML / AD 集成</li>
+          <li><span class="check-icon">✓</span> 99.9% SLA 保障</li>
+          <li><span class="check-icon">✓</span> 专属客户成功团队</li>
+          <li><span class="check-icon">✓</span> API 白名单 + 审计日志</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;justify-content:center;">联系销售</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <div class="badge" style="margin-bottom:16px;">用户评价</div>
+      <h2 class="section-title">他们都爱上了 <span class="gradient-text">TOKEN-HUB</span></h2>
+      <p class="section-sub">来自不同行业用户的真实使用感受</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"用了 TOKEN-HUB 之后，我的日常写作效率提升了不止一倍。它能理解我想要的语气和风格，每次给的建议都特别到位，感觉像真的在和懂我的人合作。"</div>
+        <div class="testi-author">
+          <div class="testi-avatar">L</div>
+          <div>
+            <div class="testi-name">李晓明</div>
+            <div class="testi-role">内容创作者 · 北京</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"作为一名开发者，我最欣赏它的代码理解能力和 Agent 规划功能。复杂的重构任务，它能自己拆解步骤执行，省了我很多时间。"</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#38bdf8,#6c63ff);">Z</div>
+          <div>
+            <div class="testi-name">张宇航</div>
+            <div class="testi-role">高级软件工程师 · 深圳</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card fade-up">
+        <div class="testi-stars">★★★★★</div>
+        <div class="testi-quote">"我们企业部署了 TOKEN-HUB 后，客服响应效率提升了 300%。它不只是机械回答，还能感知客户情绪，处理复杂投诉时的表现令我们惊喜。"</div>
+        <div class="testi-author">
+          <div class="testi-avatar" style="background:linear-gradient(135deg,#f472b6,#a78bfa);">W</div>
+          <div>
+            <div class="testi-name">王蕾</div>
+            <div class="testi-role">数字化负责人 · 某电商公司</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA ─── -->
+<section id="cta">
+  <div class="cta-bg"></div>
+  <div class="blob blob-1" style="top:auto;bottom:-100px;opacity:.6;"></div>
+  <div class="container" style="position:relative;z-index:2;">
+    <div class="badge" style="margin-bottom:24px;">限时优惠</div>
+    <h2 class="cta-title">
+      现在加入，<br/>
+      <span class="gradient-text">30 天免费体验</span>
+    </h2>
+    <p class="cta-sub">无需信用卡，无需配置，注册即可开始使用全部专业功能</p>
+    <div class="cta-actions">
+      <a href="#" class="btn btn-primary" style="padding:16px 40px;font-size:17px;">
+        免费开始体验 →
+      </a>
+      <a href="#" class="btn btn-outline" style="padding:16px 40px;font-size:17px;">
+        预约产品演示
+      </a>
+    </div>
+    <div class="cta-note">
+      <svg style="display:inline;vertical-align:middle;margin-right:4px;" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      已有超过 200 万用户信任 TOKEN-HUB · 数据加密存储 · 随时可删除账号
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="logo-icon">✦</div>
+          <span>TOKEN-HUB <span class="gradient-text">AI</span></span>
+        </div>
+        <p class="footer-desc">
+          新旦智能旗下 AI 产品平台，以 xDAN 模型为驱动，构建新一代个性化多模态智能体，为用户提供专属的智能服务体验。
+        </p>
+        <div class="footer-social">
+          <div class="social-btn" title="微信">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.5 11.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm6 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/><path d="M20.74 10.18C20.74 5.11 16.24 1 10.74 1S.74 5.11.74 10.18c0 2.87 1.36 5.44 3.51 7.18l-.89 2.67 3.1-1.55c1.04.29 2.14.45 3.28.45.47 0 .94-.03 1.39-.08A7.47 7.47 0 0 0 10.74 23c4.14 0 7.5-3.36 7.5-7.5 0-.72-.1-1.41-.29-2.07a9.23 9.23 0 0 0 2.79-3.25zM15.5 18.5a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm4 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>
+          </div>
+          <div class="social-btn" title="微博">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10.09 9.61c-3.16.27-5.59 2.2-5.59 4.56 0 2.43 2.64 4.39 5.91 4.39s5.91-1.96 5.91-4.39c0-.22-.03-.44-.09-.65-.04-.14-.19-.22-.33-.17-.14.04-.22.18-.18.33.04.17.07.34.07.5 0 2.02-2.39 3.67-5.38 3.67s-5.38-1.65-5.38-3.67 2.39-3.67 5.38-3.67c.14 0 .27-.12.27-.26s-.13-.31-.27-.31c-.1 0-.2-.01-.29-.01l-.04.01zm2.24 2.45c.64.12 1.04.77.89 1.45-.15.68-.81 1.12-1.45 1-.64-.12-1.04-.77-.89-1.45.15-.68.81-1.12 1.45-1zM10.41 11c-.32.06-.52.38-.44.73.07.35.41.56.73.5.32-.06.52-.38.44-.73-.07-.35-.41-.56-.73-.5z"/><path d="M21.97 8.45C21.36 5.06 18.35 2.5 14.81 2.5c-1.26 0-2.44.36-3.44.98-1.14.71-1.04 1.82.21 2.18.44.13.85.08 1.14-.09.5-.3 1.06-.47 1.65-.47 1.97 0 3.57 1.66 3.57 3.71 0 .08-.01.16-.01.24-.01.16.06.31.18.42.12.1.29.14.44.09.52-.16 1.04-.12 1.51.14.84.46.99 1.31.49 2.07-.24.36-.15.86.19 1.14.35.28.83.22 1.1-.14 1.01-1.41 1.07-3.34.13-5.32z"/></svg>
+          </div>
+          <div class="social-btn" title="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          </div>
+          <div class="social-btn" title="LinkedIn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">产品</div>
+        <ul class="footer-links">
+          <li><a href="#">TOKEN-HUB Chat</a></li>
+          <li><a href="#">TOKEN-HUB API</a></li>
+          <li><a href="#">TOKEN-HUB Enterprise</a></li>
+          <li><a href="#">xDAN 模型</a></li>
+          <li><a href="#">插件市场</a></li>
+          <li><a href="#">更新日志</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">资源</div>
+        <ul class="footer-links">
+          <li><a href="#">开发者文档</a></li>
+          <li><a href="#">API 参考</a></li>
+          <li><a href="#">SDK 下载</a></li>
+          <li><a href="#">示例项目</a></li>
+          <li><a href="#">技术博客</a></li>
+          <li><a href="#">社区论坛</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">公司</div>
+        <ul class="footer-links">
+          <li><a href="#">关于新旦智能</a></li>
+          <li><a href="#">加入我们</a></li>
+          <li><a href="#">媒体资源</a></li>
+          <li><a href="#">联系我们</a></li>
+          <li><a href="#">合作伙伴</a></li>
+          <li><a href="#">投资者关系</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2024 新旦智能（深圳）有限公司 · token-hub.ai · All rights reserved.</div>
+      <div class="footer-legal">
+        <a href="#">隐私政策</a>
+        <a href="#">服务条款</a>
+        <a href="#">Cookie 设置</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ─── Navbar scroll ─── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  /* ─── Mobile menu ─── */
+  function openMobile() { document.getElementById('mobileMenu').classList.add('open'); }
+  function closeMobile() { document.getElementById('mobileMenu').classList.remove('open'); }
+
+  /* ─── Intersection Observer fade-in ─── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  /* ─── Counter animation ─── */
+  function animateCounter(el) {
+    const target = parseInt(el.dataset.target);
+    const duration = 1800;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      if (target >= 1000000) el.textContent = (current / 10000).toFixed(0) + '万';
+      else el.textContent = Math.floor(current);
+    }, 16);
+  }
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.counter').forEach(animateCounter);
+        counterObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.5 });
+  counterObserver.observe(document.querySelector('.hero-stats'));
+
+  /* ─── Chat Demo ─── */
+  const aiResponse = `好的！以下是当前主流 AI 大模型市场竞争格局分析：
+
+| 厂商 | 代表模型 | 优势 | 劣势 |
+|------|----------|------|------|
+| OpenAI | GPT-4o | 生态最强、工具链完整 | 价格较高、中国访问受限 |
+| Anthropic | Claude 3.5 | 安全对齐、长上下文 | 商业生态较弱 |
+| Google | Gemini Ultra | 多模态、Google 生态 | 产品迭代较慢 |
+| Meta | Llama 3.1 | 开源、可私有化 | 需自行部署维护 |
+| 百度 | ERNIE 4.0 | 中文最强、政策合规 | 国际竞争力有限 |
+| 新旦智能 | xDAN-4.0 | 高情商推理、MoE架构 | 生态建设中 |
+
+**核心洞察：** 市场正在从"能力竞争"转向"场景与生态竞争"，高情商 + 专业化将是下一阶段的关键差异化优势。`;
+
+  let typingTimeout;
+  function showAIResponse() {
+    const typingMsg = document.getElementById('typingMsg');
+    const aiResponseMsg = document.getElementById('aiResponseMsg');
+    const aiResponseBubble = document.getElementById('aiResponseBubble');
+
+    typingMsg.style.display = 'flex';
+    setTimeout(() => {
+      typingMsg.style.display = 'none';
+      aiResponseMsg.style.display = 'flex';
+      aiResponseBubble.innerHTML = formatResponse(aiResponse);
+    }, 2200);
+  }
+  showAIResponse();
+
+  function formatResponse(text) {
+    const lines = text.split('\n');
+    let result = '';
+    let inTable = false;
+    lines.forEach(line => {
+      if (line.startsWith('|')) {
+        if (!inTable) { result += '<table style="border-collapse:collapse;width:100%;font-size:12px;margin:10px 0;">'; inTable = true; }
+        const cells = line.split('|').filter(c => c.trim() && !c.trim().match(/^[-\s]+$/));
+        if (cells.length > 0) {
+          result += '<tr>' + cells.map(c => `<td style="padding:7px 10px;border:1px solid rgba(255,255,255,.1);color:#c4cdea;">${c.trim()}</td>`).join('') + '</tr>';
+        }
+      } else {
+        if (inTable) { result += '</table>'; inTable = false; }
+        if (line.startsWith('**') && line.endsWith('**')) {
+          result += `<p style="font-weight:700;color:#f0f2ff;margin:10px 0 4px;">${line.replace(/\*\*/g,'')}</p>`;
+        } else if (line.trim()) {
+          result += `<p style="margin:6px 0;">${line}</p>`;
+        }
+      }
+    });
+    if (inTable) result += '</table>';
+    return result;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const val = input.value.trim();
+    if (!val) return;
+    const messages = document.getElementById('chatMessages');
+    const typingMsg = document.getElementById('typingMsg');
+
+    const userMsg = document.createElement('div');
+    userMsg.className = 'msg user';
+    userMsg.innerHTML = `<div class="msg-avatar user-av">👤</div><div class="msg-bubble">${val}</div>`;
+    messages.insertBefore(userMsg, typingMsg);
+    input.value = '';
+
+    typingMsg.style.display = 'flex';
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      typingMsg.style.display = 'none';
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'msg ai';
+      aiMsg.innerHTML = `<div class="msg-avatar ai">✦</div><div class="msg-bubble">感谢你的提问！这是一个很有深度的问题。TOKEN-HUB 正在深度思考并为你生成专属回答，结合你的偏好与上下文，我会给出最贴合你需求的分析。</div>`;
+      messages.insertBefore(aiMsg, typingMsg);
+      messages.scrollTop = messages.scrollHeight;
+    }, 1800);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  document.getElementById('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendMessage();
+  });
+
+  /* ─── Smooth active nav highlight ─── */
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  window.addEventListener('scroll', () => {
+    let cur = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) cur = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--text)' : '';
+    });
+  });
+</script>
+</body>
+</html>
